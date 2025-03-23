@@ -15,7 +15,7 @@ docker stop tweet-postgres
 docker stop rabbitmq
 
 
-create database:
+-create database:
 
 docker run --name tweet-postgres ^
   -e POSTGRES_USER=postgres ^
