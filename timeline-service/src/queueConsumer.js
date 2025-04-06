@@ -13,21 +13,19 @@ async function consumeTweets() {
 
     await channel.assertQueue(QUEUE_NAME, { durable: true });
 
-    console.log(`✅ Listening for tweets in queue: ${QUEUE_NAME}`);
+    console.log(`Listening for tweets in queue: ${QUEUE_NAME}`);
 
     channel.consume(QUEUE_NAME, (msg) => {
       if (msg !== null) {
         const tweet = JSON.parse(msg.content.toString());
-        console.log('🧠 Received tweet:', tweet);
-
-        // Save tweet to timeline
+        console.log('Received tweet:', tweet);
         timeline.push(tweet);
 
         channel.ack(msg);
       }
     });
   } catch (err) {
-    console.error('❌ Error consuming tweets:', err);
+    console.error('Error consuming tweets:', err);
   }
 }
 

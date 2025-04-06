@@ -15,13 +15,13 @@ async function publishTweetEvent(tweet) {
       persistent: true,
     });
 
-    console.log('✅ Tweet published to queue');
+    console.log('Tweet published to queue');
 
     setTimeout(() => {
       connection.close();
     }, 500);
   } catch (err) {
-    console.error('❌ Error publishing tweet:', err);
+    console.error('Error publishing tweet:', err);
   }
 }
 

@@ -11,5 +11,5 @@ app.use('/', routes);
 
 app.listen(PORT, () => {
   console.log(`📡 Timeline Service running at http://localhost:${PORT}`);
-  consumeTweets(); // Start listening to RabbitMQ
+  consumeTweets();
 });
