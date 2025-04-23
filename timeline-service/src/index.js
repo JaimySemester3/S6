@@ -10,6 +10,6 @@ app.use(express.json());
 app.use('/', routes);
 
 app.listen(PORT, () => {
-  console.log(`📡 Timeline Service running at http://localhost:${PORT}`);
+  console.log(`Timeline Service running at http://localhost:${PORT}`);
   consumeTweets();
 });

@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  tweet-service:
+    build: ./tweet-service
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - backend
+
+  timeline-service:
+    build: ./timeline-service
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+    networks:
+      - backend
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    depends_on:
+      - tweet-service
+      - timeline-service
+    environment:
+      - TWEET_SERVICE_URL=http://tweet-service:3000
+      - TIMELINE_SERVICE_URL=http://timeline-service:4000
+    networks:
+      - backend
+
+networks:
+  backend:
