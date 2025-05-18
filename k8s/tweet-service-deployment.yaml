@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweet-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tweet-service
+  template:
+    metadata:
+      labels:
+        app: tweet-service
+    spec:
+      containers:
+        - name: tweet-service
+          image: tweet-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@postgres:5432/tweet_service
+            - name: RABBITMQ_URL
+              value: amqp://rabbitmq
+            - name: TWEET_QUEUE
+              value: new_tweets

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timeline-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timeline-service
+  template:
+    metadata:
+      labels:
+        app: timeline-service
+    spec:
+      containers:
+        - name: timeline-service
+          image: timeline-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 4000
+          env:
+            - name: RABBITMQ_URL
+              value: amqp://rabbitmq
+            - name: TWEET_QUEUE
+              value: new_tweets

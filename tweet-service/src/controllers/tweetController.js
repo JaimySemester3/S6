@@ -10,7 +10,7 @@ async function createTweet(req, res) {
       console.log('Missing fields');
       return res.status(400).json({ success: false, message: 'Missing fields' });
     }
-
+    
     const newTweet = await prisma.tweet.create({
       data: { text, author },
     });
@@ -26,7 +26,6 @@ async function createTweet(req, res) {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 }
-
 
 async function getAllTweets(req, res) {
   const tweets = await prisma.tweet.findMany({
