@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  tweet-service:
+    build: ./tweet-service
+    ports:
+      - "3000:3000"
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+      - TWEET_QUEUE=new_tweets
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tweet_service
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+
+  timeline-service:
+    build: ./timeline-service
+    ports:
+      - "4000:4000"
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+      - TWEET_QUEUE=new_tweets
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    depends_on:
+      - tweet-service
+      - timeline-service
+    environment:
+      - TWEET_SERVICE_URL=http://tweet-service:3000
+      - TIMELINE_SERVICE_URL=http://timeline-service:4000
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" 
+      - "15672:15672" 
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tweet_service
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+
+networks:
+  backend:

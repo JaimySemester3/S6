@@ -2,7 +2,7 @@ require('dotenv').config();
 const amqp = require('amqplib');
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
-const QUEUE_NAME = 'tweet_queue';
+const QUEUE_NAME = process.env.TWEET_QUEUE;
 
 let tweets = [];
 let currentId = 1;

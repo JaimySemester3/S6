@@ -2,19 +2,29 @@ const prisma = require('../prismaClient');
 const { publishTweetEvent } = require('../rabbitmqProducer');
 
 async function createTweet(req, res) {
-  const { text, author } = req.body;
+  try {
+    console.log('Received POST /tweets with body:', req.body);
 
-  if (!text || !author) {
-    return res.status(400).json({ success: false, message: 'Missing fields' });
+    const { text, author } = req.body;
+    if (!text || !author) {
+      console.log('Missing fields');
+      return res.status(400).json({ success: false, message: 'Missing fields' });
+    }
+    
+    const newTweet = await prisma.tweet.create({
+      data: { text, author },
+    });
+    console.log('Tweet saved to DB:', newTweet);
+
+    await publishTweetEvent(newTweet);
+    console.log('Tweet published to RabbitMQ');
+
+    res.status(201).json({ success: true, data: newTweet });
+    console.log('Response sent to client');
+  } catch (err) {
+    console.error('Error in controller:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
-
-  const newTweet = await prisma.tweet.create({
-    data: { text, author },
-  });
-
-  await publishTweetEvent(newTweet);
-
-  res.status(201).json({ success: true, data: newTweet });
 }
 
 async function getAllTweets(req, res) {
