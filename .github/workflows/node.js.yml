@@ -38,8 +38,8 @@ jobs:
         file: ./tweet-service/Dockerfile
         push: true
         tags: |
-          jaimyderks/twitter-clone:latest
-          jaimyderks/twitter-clone:${{ github.sha }}
+          jaimydocker/jaimy_docker:latest
+          jaimydocker/jaimy_docker:${{ github.sha }}
 
     - name: Use Node.js
       uses: actions/setup-node@v3
