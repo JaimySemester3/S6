@@ -14,6 +14,8 @@ stopping the application:
 docker stop tweet-postgres
 docker stop rabbitmq
 
+front-end:
+npm run dev
 
 -create database:
 
