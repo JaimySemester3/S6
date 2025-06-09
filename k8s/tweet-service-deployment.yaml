@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: tweet-service
-          image: tweet-service
-          imagePullPolicy: Never
+          image: jaimydocker/jaimy_docker:tweet-service
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:

@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: timeline-service
-          image: timeline-service
-          imagePullPolicy: Never
+          image: jaimydocker/jaimy_docker:tweet-service
+          imagePullPolicy: Always
           ports:
             - containerPort: 4000
           env:
