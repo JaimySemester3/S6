@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tweet-service
+  namespace: secure-app
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tweet-service
-          image: jaimydocker/jaimy_docker:tweet-service
+          image: jaimydocker/jaimy_docker:tweet-latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -25,3 +26,30 @@ spec:
               value: amqp://rabbitmq
             - name: TWEET_QUEUE
               value: new_tweets
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: auth0-secret
+                  key: AUTH0_DOMAIN
+            - name: AUTH0_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: auth0-secret
+                  key: AUTH0_AUDIENCE
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 3000
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
