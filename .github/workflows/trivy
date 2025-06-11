@@ -1,0 +1,57 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    name: Run Trivy on tweet-service and timeline-service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      ######################################
+      # tweet-service: Docker Image Scan
+      ######################################
+      - name: Build Docker image for tweet-service
+        run: docker build -t tweet-service:local ./tweet-service
+
+      - name: Scan tweet-service Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: tweet-service:local
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      ######################################
+      # timeline-service: Docker Image Scan
+      ######################################
+      - name: Build Docker image for timeline-service
+        run: docker build -t timeline-service:local ./timeline-service
+
+      - name: Scan timeline-service Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: timeline-service:local
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      ######################################
+      # Kubernetes Config Scan
+      ######################################
+      - name: Scan Kubernetes manifests
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: ./k8s
+          format: table
+          exit-code: 0
