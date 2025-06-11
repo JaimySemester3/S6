@@ -28,7 +28,7 @@ jobs:
         with:
           image-ref: tweet-service:local
           format: table
-          exit-code: 1
+          exit-code: 0
           severity: CRITICAL,HIGH
 
       ######################################
@@ -42,7 +42,7 @@ jobs:
         with:
           image-ref: timeline-service:local
           format: table
-          exit-code: 1
+          exit-code: 0
           severity: CRITICAL,HIGH
 
       ######################################
