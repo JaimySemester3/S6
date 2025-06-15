@@ -11,12 +11,14 @@ Write-Host "Rebuilding Docker images (if needed)..."
 docker build -t tweet-service ./tweet-service
 docker build -t timeline-service ./timeline-service
 
+kubectl apply -f k8s/dev/auth0-secret.yaml
+
 Write-Host "Reapplying Kubernetes manifests..."
 kubectl apply -f k8s/postgres.yaml
 kubectl apply -f k8s/rabbitmq.yaml
-kubectl apply -f k8s/tweet-service-deployment.yaml
+kubectl apply -f k8s/dev/tweet-service-deployment-local.yaml
 kubectl apply -f k8s/tweet-service.yaml
-kubectl apply -f k8s/timeline-service-deployment.yaml
+kubectl apply -f k8s/dev/timeline-service-deployment-local.yaml
 kubectl apply -f k8s/timeline-service.yaml
 kubectl apply -f k8s/ingress.yaml
 

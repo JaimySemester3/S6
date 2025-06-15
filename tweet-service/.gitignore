@@ -20,3 +20,5 @@ Thumbs.db
 # Build output (if any)
 dist/
 build/
+
+restart.ps1

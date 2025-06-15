@@ -1,0 +1,5 @@
+# Ignore real secret file
+auth0-secret.yaml
+timeline-service-deployment-local.yaml
+tweet-service-deployment-local.yaml
+/dev

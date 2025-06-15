@@ -1,5 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import './App.css';
 
 function App() {
@@ -13,44 +14,61 @@ function App() {
   } = useAuth0();
 
   const [timeline, setTimeline] = useState([]);
+  const [userEmail, setUserEmail] = useState('');
+
+  useEffect(() => {
+    const fetchEmailFromToken = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const decoded = jwtDecode(token);
+        const emailClaim = decoded['https://yourapp.com/email'];
+        setUserEmail(emailClaim);
+      } catch (err) {
+        console.error('❌ Failed to decode token:', err);
+      }
+    };
+
+    if (isAuthenticated) fetchEmailFromToken();
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   const postTweet = async () => {
     try {
       const token = await getAccessTokenSilently();
+
       const res = await fetch('/tweets', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: 'Hello from Vite!', author: user.name }),
+        body: JSON.stringify({ text: 'Hello from Vite!' }),
       });
 
       const data = await res.json();
-      console.log('Tweet response:', data);
-    } catch (error) {
-      console.error('Tweet error:', error);
+      if (!res.ok) {
+        console.error("❌ Tweet POST failed:", data);
+      }
+    } catch (err) {
+      console.error("❌ Tweet error:", err);
     }
   };
 
-const fetchTimeline = async () => {
-  try {
-    const token = await getAccessTokenSilently();
-    const res = await fetch(`/timeline/${user.name}`, {
-    //const res = await fetch(`/timeline/jaimy`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const fetchTimeline = async () => {
+    try {
+      const token = await getAccessTokenSilently();
+      const res = await fetch(`/timeline/${encodeURIComponent(userEmail)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      setTimeline(data.data || []);
+    } catch (error) {
+      console.error('❌ Timeline error:', error);
+    }
+  };
 
-    setTimeline(data.data || []);
-    console.log('Timeline response:', data.data);
-  } catch (error) {
-    console.error('Timeline error:', error);
-  }
-};
   if (isLoading) return <p>Loading...</p>;
 
   return (
@@ -61,7 +79,7 @@ const fetchTimeline = async () => {
         <button onClick={() => loginWithRedirect()}>🔐 Log In</button>
       ) : (
         <>
-          <p>Logged in as <strong>{user.name}</strong></p>
+          <p>Logged in as <strong>{userEmail || user.name}</strong></p>
           <button onClick={() => logout({ returnTo: window.location.origin })}>
             Log Out
           </button>
