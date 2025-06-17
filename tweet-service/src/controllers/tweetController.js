@@ -1,15 +1,27 @@
 const prisma = require('../prismaClient');
 const { publishTweetEvent } = require('../rabbitmqProducer');
+const { body, validationResult } = require('express-validator');
 
+const validateTweet = [
+  body('text')
+    .trim()
+    .isLength({ min: 1, max: 280 })
+    .withMessage('Tweet must be between 1 and 280 characters'),
+];
 // POST /tweets
 async function createTweet(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, errors: errors.array() });
+  }
+
   try {
     const email = req.auth?.['https://yourapp.com/email'];
     const { text } = req.body;
 
-    if (!text || !email) {
-      console.warn('⚠️ Missing text or user email:', { text, email });
-      return res.status(400).json({ success: false, message: 'Missing text or user email' });
+    if (!email) {
+      console.warn('⚠️ Missing user email:', { email });
+      return res.status(400).json({ success: false, message: 'Missing user email' });
     }
 
     const newTweet = await prisma.tweet.create({
@@ -73,6 +85,7 @@ async function deleteTweet(req, res) {
 }
 
 module.exports = {
+  validateTweet,
   createTweet,
   getAllTweets,
   getTweetById,

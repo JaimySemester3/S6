@@ -1,6 +1,6 @@
 const express = require('express');
 const checkJwt = require('../middleware/auth');
-const { getTimelineForUser } = require('./queueConsumer');
+const { getTimelineForUser } = require('./queueConsumer.js');
 
 const router = express.Router();
 

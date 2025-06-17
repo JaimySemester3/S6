@@ -12,6 +12,7 @@ docker build -t tweet-service ./tweet-service
 docker build -t timeline-service ./timeline-service
 
 kubectl apply -f k8s/dev/auth0-secret.yaml
+kubectl apply -f k8s/dev/tweet-db-secret.yaml
 
 Write-Host "Reapplying Kubernetes manifests..."
 kubectl apply -f k8s/postgres.yaml

@@ -18,9 +18,10 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: tweet-db-secret
           env:
-            - name: DATABASE_URL
-              value: postgresql://postgres:postgres@postgres:5432/tweet_service
             - name: RABBITMQ_URL
               value: amqp://rabbitmq
             - name: TWEET_QUEUE

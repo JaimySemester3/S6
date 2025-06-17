@@ -1,6 +1,7 @@
 const express = require('express');
 const checkJwt = require('../middleware/auth');
 const {
+  validateTweet,
   createTweet,
   getAllTweets,
   getTweetById,
@@ -14,7 +15,7 @@ router.get('/health', (req, res) => {
 });
 router.use(checkJwt);
 
-router.post('/', createTweet);
+router.post('/', validateTweet, createTweet);
 router.get('/', getAllTweets);
 router.get('/:id', getTweetById);
 router.delete('/:id', deleteTweet);
