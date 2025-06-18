@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "cross-env NODE_ENV=test jest"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "prisma": "^6.5.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "jest": "^30.0.0",
     "supertest": "^7.1.1"
   }
