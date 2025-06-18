@@ -9,16 +9,9 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: /tweets
+            path: /
             backend:
               service:
-                name: tweet-service
+                name: api-gateway
                 port:
-                  number: 3000
-          - pathType: Prefix
-            path: /timeline
-            backend:
-              service:
-                name: timeline-service
-                port:
-                  number: 4000
+                  number: 80

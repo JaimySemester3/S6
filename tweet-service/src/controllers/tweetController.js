@@ -61,6 +61,26 @@ async function getTweetById(req, res) {
   res.json({ success: true, data: tweet });
 }
 
+async function getMyTweets(req, res) {
+  try {
+    const email = req.auth?.['https://yourapp.com/email'];
+
+    if (!email) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: email not found' });
+    }
+
+    const tweets = await prisma.tweet.findMany({
+      where: { author: email },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json({ success: true, data: tweets });
+  } catch (err) {
+    console.error('❌ Error in getMyTweets:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
+
 // DELETE /tweets/:id
 async function deleteTweet(req, res) {
   try {
@@ -84,10 +104,39 @@ async function deleteTweet(req, res) {
   }
 }
 
+async function deleteAllTweetsByUser(req, res) {
+  try {
+    const email = req.auth?.['https://yourapp.com/email'];
+    console.log('📨 Email extracted for deletion:', email);
+
+    if (!email) {
+      console.warn('⚠️ Missing email in JWT payload');
+      return res.status(400).json({ success: false, message: 'Missing user email' });
+    }
+
+    const deleted = await prisma.tweet.deleteMany({
+      where: { author: email },
+    });
+
+    console.log('🗑️ Deleted tweets count:', deleted.count);
+
+    res.json({ success: true, deletedCount: deleted.count });
+  } catch (err) {
+    console.error('❌ Error deleting user tweets:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
 module.exports = {
   validateTweet,
   createTweet,
   getAllTweets,
   getTweetById,
   deleteTweet,
+  getMyTweets,
+  deleteAllTweetsByUser,
 };

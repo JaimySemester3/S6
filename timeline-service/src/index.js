@@ -3,22 +3,18 @@ const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
-const { consumeTweets } = require('./queueConsumer.js');
 
 const app = express();
-app.set('trust proxy', 1);
 const PORT = process.env.PORT || 4000;
 
-
+app.set('trust proxy', 1);
 app.use(express.json());
+app.use(helmet());
 
 const generalLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, 
+  windowMs: 60_000,
   max: 10,
-  message: {
-    success: false,
-    message: 'Too many requests, please slow down.',
-  },
+  message: { success: false, message: 'Too many requests, please slow down.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -26,6 +22,5 @@ const generalLimiter = rateLimit({
 app.use('/', generalLimiter, routes);
 
 app.listen(PORT, () => {
-  console.log(`Timeline Service running at http://localhost:${PORT}`);
-  consumeTweets();
+  console.log(`✅ Timeline Service running at http://localhost:${PORT}`);
 });

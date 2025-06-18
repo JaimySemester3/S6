@@ -1,3 +1,5 @@
+// react-frontend/vite.config.js
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -5,8 +7,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/tweets': 'http://microservices.local',
-      '/timeline': 'http://microservices.local',
+      '/user': 'http://microservices.local',  
+      '/tweets': 'http://microservices.local', 
+      '/timeline': 'http://microservices.local', 
+
+      // '/tweets': 'http://20.13.192.26:3000',    
+      // '/timeline': 'http://4.207.239.104:4000' 
     }
   }
 })
