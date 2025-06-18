@@ -1,8 +1,11 @@
+// react-frontend/src/pages/Home.jsx
 import { useAuth0 } from '@auth0/auth0-react';
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import ConsentPopup from '../components/ConsentPopup';
 import './Home.css';
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function Home() {
   const {
@@ -27,7 +30,7 @@ function Home() {
         const emailClaim = decoded['https://yourapp.com/email'];
         setUserEmail(emailClaim);
 
-        const consentRes = await fetch('/user/consent', {
+        const consentRes = await fetch(`${API_BASE}/user/consent`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -50,7 +53,7 @@ function Home() {
   const fetchTimeline = async (tokenParam) => {
     try {
       const token = tokenParam || await getAccessTokenSilently();
-      const res = await fetch('/timeline/all', {
+      const res = await fetch(`${API_BASE}/timeline/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -66,7 +69,7 @@ function Home() {
     try {
       const token = await getAccessTokenSilently();
 
-      const res = await fetch('/tweets', {
+      const res = await fetch(`${API_BASE}/tweets`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -90,7 +93,7 @@ function Home() {
   const handleConsentAccept = async () => {
     try {
       const token = await getAccessTokenSilently();
-      const res = await fetch('/user/consent', {
+      const res = await fetch(`${API_BASE}/user/consent`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -116,7 +119,7 @@ function Home() {
     return (
       <div className="login-screen">
         <div className="login-card">
-          <h1><span role="img" aria-label="bird">🐦</span> <strong>TweetApp</strong></h1>
+          <h1>🐦 <strong>TweetApp</strong></h1>
           <p>Please log in to view and post tweets.</p>
           <button className="login-btn" onClick={() => loginWithRedirect()}>
             🔐 Log In

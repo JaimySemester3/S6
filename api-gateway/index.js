@@ -1,9 +1,17 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const checkJwt = require('./middleware/auth');
 
 const app = express();
+
+// ✅ Enable CORS for all routes
+app.use(cors({
+  origin: '*', // 🔒 In production, replace with your frontend domain (e.g. 'https://your-app.web.app')
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Define open (unauthenticated) paths
 const openPaths = [
@@ -21,7 +29,7 @@ app.use((req, res, next) => {
 
 // ------------------ Proxy routes ------------------
 
-// 🟦 Tweet Service (mounted under /tweets in its own app, so no rewrite)
+// 🟦 Tweet Service
 app.use('/tweets', createProxyMiddleware({
   target: 'http://tweet-service:3000',
   changeOrigin: true,
@@ -33,7 +41,7 @@ app.use('/tweets', createProxyMiddleware({
   }
 }));
 
-// 🟩 Timeline Service (not mounted under a prefix — needs rewrite)
+// 🟩 Timeline Service
 app.use('/timeline', createProxyMiddleware({
   target: 'http://timeline-service:4000',
   changeOrigin: true,
@@ -45,7 +53,7 @@ app.use('/timeline', createProxyMiddleware({
   }
 }));
 
-// 🟨 User Service (mounted under /user in app, so no rewrite)
+// 🟨 User Service
 app.use('/user', createProxyMiddleware({
   target: 'http://user-service:3002',
   changeOrigin: true,

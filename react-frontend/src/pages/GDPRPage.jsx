@@ -1,5 +1,8 @@
+// react-frontend/src/pages/GDPRPage.jsx
 import { useAuth0 } from '@auth0/auth0-react';
 import { useState } from 'react';
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function GDPRPage() {
   const { getAccessTokenSilently, logout } = useAuth0();
@@ -10,7 +13,7 @@ function GDPRPage() {
     setStatus('Fetching tweets...');
     try {
       const token = await getAccessTokenSilently();
-      const res = await fetch('/tweets/me', {
+      const res = await fetch(`${API_BASE}/tweets/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -18,7 +21,6 @@ function GDPRPage() {
       setUserTweets(tweets);
       setStatus(`Fetched ${tweets.length} tweets.`);
 
-      // Automatically trigger download
       const blob = new Blob([JSON.stringify(tweets, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -39,7 +41,7 @@ function GDPRPage() {
     setStatus('Deleting personal data...');
     try {
       const token = await getAccessTokenSilently();
-      const res = await fetch('/tweets', {
+      const res = await fetch(`${API_BASE}/tweets`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -69,10 +71,7 @@ function GDPRPage() {
         <button onClick={fetchMyTweets} style={{ marginRight: '1rem' }}>
           📥 Download My Data
         </button>
-        <button
-          onClick={deleteMyTweets}
-          style={{ backgroundColor: 'red', color: 'white' }}
-        >
+        <button onClick={deleteMyTweets} style={{ backgroundColor: 'red', color: 'white' }}>
           🗑️ Delete My Data
         </button>
       </div>
