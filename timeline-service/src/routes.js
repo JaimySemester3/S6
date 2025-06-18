@@ -1,4 +1,3 @@
-console.log('⚙️  /timeline/all called');
 const express = require('express');
 const checkJwt = require('../middleware/auth');
 const { requestAllTweets } = require('../middleware/queueConsumer');
@@ -9,12 +8,15 @@ router.get('/health', (req, res) => {
   res.json({ status: 'Timeline Service OK' });
 });
 
+router.get('/.well-known/acme-challenge/:token', (req, res) => {
+  res.status(200).send('ACME challenge path ready');
+});
+
 router.get('/all', checkJwt, async (req, res) => {
   try {
     console.log('⚙️  /timeline/all called');
 
     const tweets = await requestAllTweets();
-
     console.log('✅ Fetched tweets:', Array.isArray(tweets), tweets.length);
 
     if (!Array.isArray(tweets)) {

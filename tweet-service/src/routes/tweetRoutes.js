@@ -16,6 +16,10 @@ router.get('/health', (req, res) => {
   res.json({ status: 'Tweet Service OK' });
 });
 
+router.get('/.well-known/acme-challenge/:token', (req, res) => {
+  res.status(200).send('ACME challenge passthrough');
+});
+
 router.use(checkJwt);
 
 router.post('/', validateTweet, createTweet);

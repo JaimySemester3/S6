@@ -8,10 +8,16 @@ const app = express();
 
 // ✅ Enable CORS for all routes
 app.use(cors({
-  origin: '*', // 🔒 In production, replace with your frontend domain (e.g. 'https://your-app.web.app')
+  origin: '*', // 🔒 In production, use your actual frontend domain
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// 🔓 Allow Let's Encrypt challenge path through with no auth
+app.use('/.well-known/acme-challenge', (req, res) => {
+  // The actual ACME solver pod should respond — we just avoid 401 here
+  res.status(200).send('ACME challenge passthrough');
+});
 
 // Define open (unauthenticated) paths
 const openPaths = [
@@ -24,7 +30,7 @@ const openPaths = [
 app.use((req, res, next) => {
   const match = openPaths.find(route => req.path === route.path && req.method === route.method);
   if (match) return next(); // allow health checks
-  return checkJwt(req, res, next); // enforce auth for others
+  return checkJwt(req, res, next); // enforce JWT otherwise
 });
 
 // ------------------ Proxy routes ------------------
@@ -33,7 +39,7 @@ app.use((req, res, next) => {
 app.use('/tweets', createProxyMiddleware({
   target: 'http://tweet-service:3000',
   changeOrigin: true,
-  pathRewrite: {}, // Don't strip /tweets
+  pathRewrite: {}, // Preserve /tweets
   onProxyReq: (proxyReq, req) => {
     if (req.headers['authorization']) {
       proxyReq.setHeader('Authorization', req.headers['authorization']);
@@ -45,7 +51,7 @@ app.use('/tweets', createProxyMiddleware({
 app.use('/timeline', createProxyMiddleware({
   target: 'http://timeline-service:4000',
   changeOrigin: true,
-  pathRewrite: { '^/timeline': '' }, // Strip /timeline
+  pathRewrite: { '^/timeline': '' }, // Remove /timeline from path
   onProxyReq: (proxyReq, req) => {
     if (req.headers['authorization']) {
       proxyReq.setHeader('Authorization', req.headers['authorization']);
@@ -57,7 +63,7 @@ app.use('/timeline', createProxyMiddleware({
 app.use('/user', createProxyMiddleware({
   target: 'http://user-service:3002',
   changeOrigin: true,
-  pathRewrite: {}, // Don't strip /user
+  pathRewrite: {}, // Preserve /user
   onProxyReq: (proxyReq, req) => {
     if (req.headers['authorization']) {
       proxyReq.setHeader('Authorization', req.headers['authorization']);

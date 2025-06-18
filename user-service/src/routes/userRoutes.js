@@ -4,14 +4,16 @@ const { storeConsent, fetchConsent } = require('../controllers/userController');
 
 const router = express.Router();
 
-// Expose /user/health
 router.get('/health', (req, res) => {
   res.json({ status: 'User Service OK' });
 });
 
+router.get('/.well-known/acme-challenge/:token', (req, res) => {
+  res.status(200).send('ACME challenge passthrough');
+});
+
 router.use(checkJwt);
 
-// Now all routes are prefixed explicitly
 router.get('/consent', fetchConsent); 
 router.post('/consent', storeConsent);
 
