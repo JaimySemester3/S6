@@ -1,5 +1,5 @@
 jest.mock('../../src/middleware/auth', () => (req, res, next) => {
-  req.auth = {}; // Simulate missing email
+  req.auth = {};
   next();
 });
 

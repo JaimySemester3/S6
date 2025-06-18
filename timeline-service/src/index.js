@@ -21,6 +21,11 @@ const generalLimiter = rateLimit({
 
 app.use('/', generalLimiter, routes);
 
-app.listen(PORT, () => {
-  console.log(`✅ Timeline Service running at http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`✅ Timeline Service running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
