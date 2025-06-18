@@ -13,26 +13,26 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 🔓 Allow Let's Encrypt challenge path unauthenticated
-app.use('/.well-known/acme-challenge', express.static('/var/www/html'));
-
-// Define open (unauthenticated) paths
+// ✅ Define open (unauthenticated) paths
 const openPaths = [
   { path: '/tweets/health', method: 'GET' },
   { path: '/timeline/health', method: 'GET' },
   { path: '/user/health', method: 'GET' }
 ];
 
-// Global auth guard with exceptions
+// ✅ Global auth guard with exceptions
 app.use((req, res, next) => {
+  // Let cert-manager handle the ACME challenge path
   if (req.path.startsWith('/.well-known/acme-challenge')) {
-    return next(); // Skip JWT auth for ACME challenge
+    return next(); // Don't intercept this path at all
   }
 
+  // Allow health checks
   const match = openPaths.find(route => req.path === route.path && req.method === route.method);
-  if (match) return next(); // Allow health checks
+  if (match) return next();
 
-  return checkJwt(req, res, next); // Enforce JWT for everything else
+  // Enforce JWT auth
+  return checkJwt(req, res, next);
 });
 
 // ------------------ Proxy routes ------------------
