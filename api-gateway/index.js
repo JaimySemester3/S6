@@ -13,11 +13,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 🔓 Allow Let's Encrypt challenge path through with no auth
-app.use('/.well-known/acme-challenge', (req, res) => {
-  // The actual ACME solver pod should respond — we just avoid 401 here
-  res.status(200).send('ACME challenge passthrough');
-});
+// 🔓 Allow Let's Encrypt challenge path unauthenticated
+app.use('/.well-known/acme-challenge', express.static('/var/www/html'));
 
 // Define open (unauthenticated) paths
 const openPaths = [
@@ -28,9 +25,14 @@ const openPaths = [
 
 // Global auth guard with exceptions
 app.use((req, res, next) => {
+  if (req.path.startsWith('/.well-known/acme-challenge')) {
+    return next(); // Skip JWT auth for ACME challenge
+  }
+
   const match = openPaths.find(route => req.path === route.path && req.method === route.method);
-  if (match) return next(); // allow health checks
-  return checkJwt(req, res, next); // enforce JWT otherwise
+  if (match) return next(); // Allow health checks
+
+  return checkJwt(req, res, next); // Enforce JWT for everything else
 });
 
 // ------------------ Proxy routes ------------------
