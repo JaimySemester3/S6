@@ -2,33 +2,30 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-
-const tweetRoutes = require('./routes/tweetRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 app.set('trust proxy', 1);
 
-// Middleware
 app.use(cors());
-app.use(helmet());
 app.use(express.json());
 
 app.use((req, res, next) => {
-  console.log('Tweet service got request:', req.method, req.originalUrl);
+  console.log('User service got request:', req.method, req.originalUrl);
   next();
 });
 
-const tweetLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 5,
+const userLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
   message: {
     success: false,
-    message: 'Too many requests, please slow down.',
+    message: 'Too many requests. Please wait a bit.',
   },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-app.use('/', tweetLimiter, tweetRoutes);
+app.use('/', userLimiter, userRoutes);
 
 module.exports = app;

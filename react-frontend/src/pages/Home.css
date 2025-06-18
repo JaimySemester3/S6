@@ -1,0 +1,177 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f2f5;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 4rem;
+}
+
+/* Unauthenticated login screen */
+.login-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.login-card {
+  background-color: #fff;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.login-card h1 {
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.login-card p {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.login-btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background-color: #1da1f2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.login-btn:hover {
+  background-color: #0d8ddb;
+}
+
+/* Authenticated layout */
+.container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.user-info {
+  text-align: right;
+}
+
+.user-info p {
+  margin: 0 0 0.25rem 0;
+}
+
+button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #1da1f2;
+  color: white;
+}
+
+button:hover {
+  background-color: #0d8ddb;
+}
+
+.timeline h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.25rem;
+}
+
+.tweet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tweet {
+  padding: 1rem;
+  border-radius: 10px;
+  background-color: #fff;
+  border: 1px solid #e6ecf0;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.tweet:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.tweet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.tweet .author {
+  font-weight: 600;
+  color: #1da1f2;
+}
+
+.tweet .timestamp {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.tweet-body {
+  font-size: 1rem;
+  color: #222;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.composer {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.composer textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-size: 1rem;
+}
+
+.composer button {
+  align-self: flex-end;
+}
+
+.no-tweets {
+  text-align: center;
+  color: gray;
+  font-style: italic;
+}

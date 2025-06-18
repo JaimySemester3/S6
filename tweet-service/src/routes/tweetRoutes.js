@@ -6,6 +6,8 @@ const {
   getAllTweets,
   getTweetById,
   deleteTweet,
+  getMyTweets,
+  deleteAllTweetsByUser,
 } = require('../controllers/tweetController');
 
 const router = express.Router();
@@ -13,9 +15,12 @@ const router = express.Router();
 router.get('/health', (req, res) => {
   res.json({ status: 'Tweet Service OK' });
 });
+
 router.use(checkJwt);
 
 router.post('/', validateTweet, createTweet);
+router.get('/me', getMyTweets);
+router.delete('/', deleteAllTweetsByUser);
 router.get('/', getAllTweets);
 router.get('/:id', getTweetById);
 router.delete('/:id', deleteTweet);

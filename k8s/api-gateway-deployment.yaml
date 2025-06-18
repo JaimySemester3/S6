@@ -1,29 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: timeline-service
+  name: api-gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: timeline-service
+      app: api-gateway
   template:
     metadata:
       labels:
-        app: timeline-service
+        app: api-gateway
     spec:
-      priorityClassName: high-priority
       containers:
-        - name: timeline-service
-          image: jaimydocker/jaimy_docker:timeline-latest
+        - name: api-gateway
+          image: jaimydocker/jaimy_docker:api-gateway-latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 4000
+            - containerPort: 8080
           env:
-            - name: RABBITMQ_URL
-              value: amqp://rabbitmq
-            - name: TWEET_QUEUE
-              value: new_tweets
             - name: AUTH0_DOMAIN
               valueFrom:
                 secretKeyRef:
