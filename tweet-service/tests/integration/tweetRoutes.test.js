@@ -1,3 +1,13 @@
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => ({
+    connect: jest.fn(),
+    setex: jest.fn(),
+    del: jest.fn(),
+    on: jest.fn(),
+    quit: jest.fn(),
+  }));
+});
+
 const request = require('supertest');
 const app = require('../../src/app');
 const prisma = require('../../src/prismaClient');

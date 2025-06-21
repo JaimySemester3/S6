@@ -1,4 +1,3 @@
-# .\restart.ps1
 
 Write-Host "Starting Minikube..."
 & "C:\Program Files\Kubernetes\Minikube\minikube.exe" start
@@ -34,9 +33,9 @@ kubectl apply -f k8s/user-service.yaml
 
 kubectl apply -f k8s/ingress.yaml
 
-Write-Host "------------------------------------------------------------"
-Write-Host "C:\\Program Files\\Kubernetes\\Minikube\\minikube.exe tunnel"
-Write-Host "------------------------------------------------------------"
+
+# & "C:\Program Files\Kubernetes\Minikube\minikube.exe" tunnel
+
 
 # Example CURL tests (uncomment to run)
 # curl http://microservices.local/timeline/jaimy
