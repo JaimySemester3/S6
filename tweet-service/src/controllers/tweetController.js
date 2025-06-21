@@ -1,6 +1,7 @@
 const prisma = require('../prismaClient');
 const { publishTweetEvent } = require('../rabbitmqProducer');
 const { body, validationResult } = require('express-validator');
+const redis = require('../redisClient');
 
 const validateTweet = [
   body('text')
@@ -8,7 +9,7 @@ const validateTweet = [
     .isLength({ min: 1, max: 280 })
     .withMessage('Tweet must be between 1 and 280 characters'),
 ];
-// POST /tweets
+
 async function createTweet(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -32,6 +33,9 @@ async function createTweet(req, res) {
 
     await publishTweetEvent(newTweet);
 
+    await redis.del('cached:timeline');
+    console.log('🧹 Cleared Redis timeline cache after tweet');
+
     res.status(201).json({ success: true, data: newTweet });
   } catch (err) {
     console.error('❌ Error in createTweet:', err);
@@ -39,7 +43,6 @@ async function createTweet(req, res) {
   }
 }
 
-// GET /tweets
 async function getAllTweets(req, res) {
   const tweets = await prisma.tweet.findMany({
     orderBy: { createdAt: 'desc' },
@@ -48,7 +51,6 @@ async function getAllTweets(req, res) {
   res.json({ success: true, data: tweets });
 }
 
-// GET /tweets/:id
 async function getTweetById(req, res) {
   const tweet = await prisma.tweet.findUnique({
     where: { id: parseInt(req.params.id, 10) },
@@ -81,7 +83,6 @@ async function getMyTweets(req, res) {
   }
 }
 
-// DELETE /tweets/:id
 async function deleteTweet(req, res) {
   try {
     const tweetId = parseInt(req.params.id, 10);
@@ -98,6 +99,10 @@ async function deleteTweet(req, res) {
     }
 
     const deleted = await prisma.tweet.delete({ where: { id: tweetId } });
+
+    await redis.del('cached:timeline');
+    console.log('🧹 Cleared Redis cache after deleting tweet');
+
     res.json({ success: true, data: deleted });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal server error' });
@@ -117,6 +122,9 @@ async function deleteAllTweetsByUser(req, res) {
     const deleted = await prisma.tweet.deleteMany({
       where: { author: email },
     });
+
+    await redis.del('cached:timeline');
+    console.log('🧹 Cleared Redis cache after deleting all tweets by user');
 
     console.log('🗑️ Deleted tweets count:', deleted.count);
 

@@ -1,3 +1,13 @@
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => ({
+    connect: jest.fn(),
+    setex: jest.fn(),
+    del: jest.fn(),
+    on: jest.fn(),
+    quit: jest.fn(),
+  }));
+});
+
 const prisma = require('../src/prismaClient');
 const { publishTweetEvent } = require('../src/rabbitmqProducer');
 const {
@@ -8,26 +18,22 @@ const {
   deleteAllTweetsByUser,
 } = require('../src/controllers/tweetController');
 
-// ✅ Mock RabbitMQ producer
 jest.mock('../src/rabbitmqProducer', () => ({
   publishTweetEvent: jest.fn(),
 }));
 
-// ✅ Mock Prisma tweet methods
 prisma.tweet = {
   create: jest.fn(),
   findMany: jest.fn(),
   findUnique: jest.fn(),
   delete: jest.fn(),
-  deleteMany: jest.fn(), // 🔧 Add this line to fix the error
+  deleteMany: jest.fn(),
 };
 
-// ✅ Clear mocks between tests
 afterEach(() => {
   jest.clearAllMocks();
 });
 
-// ✅ Reusable mock response object
 const mockRes = () => {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);
@@ -177,7 +183,7 @@ describe('deleteAllTweetsByUser', () => {
   });
 
   it('should return 400 if email is missing', async () => {
-    const req = { auth: {} }; // no email
+    const req = { auth: {} }; 
     const res = mockRes();
 
     await deleteAllTweetsByUser(req, res);

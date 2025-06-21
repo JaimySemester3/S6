@@ -1,17 +1,31 @@
 const amqp = require('amqplib');
 const { v4: uuidv4 } = require('uuid');
+const Redis = require('ioredis');
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const REQUEST_QUEUE = 'tweet.request';
 
+// Redis connection (no auth, default port, internal cluster DNS)
+const redis = new Redis({
+  host: 'redis-master.default.svc.cluster.local',
+  port: 6379,
+});
+
 async function requestAllTweets() {
-  console.log('📤 Sending tweet request to tweet-service');
+  console.log('📤 Checking Redis cache for timeline');
+
+  const cached = await redis.get('cached:timeline');
+  if (cached) {
+    console.log('⚡ Returning tweets from Redis cache');
+    return JSON.parse(cached);
+  }
+
+  console.log('📤 Cache miss — requesting tweets from tweet-service');
+
   const connection = await amqp.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
-
   await channel.assertQueue(REQUEST_QUEUE, { durable: false });
   const { queue } = await channel.assertQueue('', { exclusive: true });
-
   const correlationId = uuidv4();
 
   return new Promise((resolve, reject) => {
@@ -23,18 +37,17 @@ async function requestAllTweets() {
 
     channel.consume(
       queue,
-      (msg) => {
-        if (msg.properties.correlationId !== correlationId) {
-          console.warn('⚠️ Skipping unrelated message:', msg.properties.correlationId);
-          return;
-        }
+      async (msg) => {
+        if (msg.properties.correlationId !== correlationId) return;
 
         clearTimeout(timeout);
 
         try {
           const parsed = JSON.parse(msg.content.toString());
 
-          console.log('📥 Received response from tweet-service:', parsed);
+          // Save to Redis for 30 seconds
+          await redis.set('cached:timeline', JSON.stringify(parsed), 'EX', 30);
+          console.log('✅ Fetched from tweet-service and cached in Redis');
 
           resolve(parsed);
         } catch (err) {
