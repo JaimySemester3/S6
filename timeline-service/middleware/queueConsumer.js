@@ -5,7 +5,6 @@ const Redis = require('ioredis');
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const REQUEST_QUEUE = 'tweet.request';
 
-// Redis connection (no auth, default port, internal cluster DNS)
 const redis = new Redis({
   host: 'redis-master.default.svc.cluster.local',
   port: 6379,
@@ -45,7 +44,6 @@ async function requestAllTweets() {
         try {
           const parsed = JSON.parse(msg.content.toString());
 
-          // Save to Redis for 30 seconds
           await redis.set('cached:timeline', JSON.stringify(parsed), 'EX', 30);
           console.log('✅ Fetched from tweet-service and cached in Redis');
 
