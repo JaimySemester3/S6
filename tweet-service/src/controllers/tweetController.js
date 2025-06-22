@@ -129,18 +129,28 @@ async function deleteAllTweetsByUser(req, res) {
     console.log('🗑️ Deleted tweets count:', deleted.count);
 
     const sendMailUrl = process.env.SENDMAIL_URL;
+
     if (!sendMailUrl) {
       console.warn('⚠️ SENDMAIL_URL not defined in environment variables');
     } else {
+      const mailPayload = {
+        to: email,
+        subject: 'Your tweets have been deleted',
+        text: `Your ${deleted.count} tweet(s) have been permanently deleted from the platform.`,
+      };
+
+      console.log('🌐 Posting to mail endpoint:', sendMailUrl);
+      console.log('✉️ Mail payload:', mailPayload);
+
       try {
-        await axios.post(sendMailUrl, {
-          to: email,
-          subject: 'Your tweets have been deleted',
-          text: `Your ${deleted.count} tweet(s) have been permanently deleted from the platform.`,
-        });
+        const mailRes = await axios.post(sendMailUrl, mailPayload);
+        console.log('✅ Mail function response:', mailRes.data);
         console.log(`📧 Notification email sent to ${email}`);
       } catch (emailErr) {
         console.error('❌ Failed to send notification email:', emailErr.message);
+        if (emailErr.response) {
+          console.error('📨 Mail function response:', emailErr.response.data);
+        }
       }
     }
 
@@ -154,6 +164,7 @@ async function deleteAllTweetsByUser(req, res) {
     });
   }
 }
+
 
 module.exports = {
   validateTweet,
