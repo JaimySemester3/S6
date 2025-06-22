@@ -2,6 +2,7 @@ const prisma = require('../prismaClient');
 const { publishTweetEvent } = require('../rabbitmqProducer');
 const { body, validationResult } = require('express-validator');
 const redis = require('../redisClient');
+const axios = require('axios');
 
 const validateTweet = [
   body('text')
@@ -125,8 +126,23 @@ async function deleteAllTweetsByUser(req, res) {
 
     await redis.del('cached:timeline');
     console.log('🧹 Cleared Redis cache after deleting all tweets by user');
-
     console.log('🗑️ Deleted tweets count:', deleted.count);
+
+    const sendMailUrl = process.env.SENDMAIL_URL;
+    if (!sendMailUrl) {
+      console.warn('⚠️ SENDMAIL_URL not defined in environment variables');
+    } else {
+      try {
+        await axios.post(sendMailUrl, {
+          to: email,
+          subject: 'Your tweets have been deleted',
+          text: `Your ${deleted.count} tweet(s) have been permanently deleted from the platform.`,
+        });
+        console.log(`📧 Notification email sent to ${email}`);
+      } catch (emailErr) {
+        console.error('❌ Failed to send notification email:', emailErr.message);
+      }
+    }
 
     res.json({ success: true, deletedCount: deleted.count });
   } catch (err) {
